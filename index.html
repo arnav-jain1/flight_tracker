@@ -108,46 +108,160 @@
         #help-modal a:hover { text-decoration: underline; }
         #help-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #aaa; line-height: 1; padding: 0; }
         #help-modal-close:hover { color: #333; }
+        /* --- New Transport Mode Tabs --- */
+        .mode-buttons { 
+            display: flex; 
+            margin-bottom: 15px; 
+            background: #eef2f5; 
+            border-radius: 8px; 
+            padding: 4px; 
+            gap: 4px; 
+            flex-shrink: 0; 
+        }
+        .mode-btn { 
+            flex: 1; 
+            padding: 8px 2px; 
+            cursor: pointer; 
+            background: transparent; 
+            border: none; 
+            font-size: 0.85em; 
+            font-weight: 700; 
+            color: #666; 
+            transition: 0.2s; 
+            border-radius: 6px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 4px; 
+        }
+        .mode-btn:hover { color: #333; }
+        .mode-btn.active { 
+            background: #fff; 
+            color: #007bff; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+        }
+        .mode-section { display: none; flex-direction: column; flex-shrink: 0; }
+        .mode-section.active { display: flex; }
+        #stats-panel {
+            pointer-events: auto;
+            position: absolute; bottom: -202px; left: 0; right: 0; height: 202px;
+            background: rgba(255,255,255,0.88);
+            backdrop-filter: blur(14px);
+            border-top: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.1);
+            transition: bottom 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            padding: 30px 24px 12px 24px; /* Increased top padding */
+            box-sizing: border-box;
+            display: flex; gap: 12px;
+        }
+        #stats-panel.open { bottom: 0; }
+        
+        #stats-mode-selector {
+            position: absolute;
+            top: 8px;
+            left: 24px;
+            font-size: 0.85em;
+            font-weight: 800;
+            color: #007bff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        #stats-mode-selector:hover { color: #0056b3; }
     </style>
 </head>
 <body>
 
 <div id="sidebar">
-    <h2 style="margin-top:0; flex-shrink:0;">Flight Tracker</h2>
-    <div class="tab-buttons", style="flex-shrink:0;">
-        <button class="tab-btn active" onclick="switchTab('route-tab')">By Route</button>
-        <button class="tab-btn" onclick="switchTab('number-tab')">By Flight #</button>
+    <h2 id="main-title" style="margin-top:0; flex-shrink:0;">Flight Tracker</h2>
+    
+    <div class="mode-buttons">
+        <button class="mode-btn active" onclick="switchMode('mode-flights', this, 'Flight Tracker')">Flights</button>
+        <button class="mode-btn" onclick="switchMode('mode-car', this, 'Car Tracker')">Car</button>
+        <button class="mode-btn" onclick="switchMode('mode-train', this, 'Train Tracker')">Train</button>
+        <button class="mode-btn" onclick="switchMode('mode-boats', this, 'Boat Tracker')">Boat</button>
     </div>
 
-    <div id="route-tab" class="tab-content active">
-        <form id="route-form">
-            <div class="row">
-                <div class="col autocomplete-wrapper">
-                    <label>From:</label>
-                    <input type="text" id="start-airport" placeholder="Search city or code..." autocomplete="off" required>
-                    <ul id="start-autocomplete" class="autocomplete-list"></ul>
+    <div id="mode-flights" class="mode-section active">
+        <div class="tab-buttons" style="flex-shrink:0;">
+            <button class="tab-btn active" onclick="switchTab('route-tab')">By Route</button>
+            <button class="tab-btn" onclick="switchTab('number-tab')">By Flight #</button>
+        </div>
+
+        <div id="route-tab" class="tab-content active">
+            <form id="route-form">
+                <div class="row">
+                    <div class="col autocomplete-wrapper">
+                        <label>From:</label>
+                        <input type="text" id="start-airport" placeholder="Search city or code..." autocomplete="off" required>
+                        <ul id="start-autocomplete" class="autocomplete-list"></ul>
+                    </div>
+                    <div class="col autocomplete-wrapper">
+                        <label>To:</label>
+                        <input type="text" id="end-airport" placeholder="Search city or code..." autocomplete="off" required>
+                        <ul id="end-autocomplete" class="autocomplete-list"></ul>
+                    </div>
                 </div>
-                <div class="col autocomplete-wrapper">
-                    <label>To:</label>
-                    <input type="text" id="end-airport" placeholder="Search city or code..." autocomplete="off" required>
-                    <ul id="end-autocomplete" class="autocomplete-list"></ul>
-                </div>
+                <label>Date:</label>
+                <input type="date" id="route-date" style="margin-bottom:15px;" required>
+                <label>Flight Number (Optional):</label>
+                <input type="text" id="opt-flight-number" placeholder="e.g. DL0001" style="margin-bottom:20px;">
+                <button type="submit">Add Flight</button>
+            </form>
+        </div>
+
+        <div id="number-tab" class="tab-content">
+            <form id="number-form">
+                <label>Flight Number:</label>
+                <input type="text" id="flight-number" placeholder="e.g. DL496" style="margin-bottom:15px;" required>
+                <label>Date:</label>
+                <input type="date" id="number-date" style="margin-bottom:20px;" required>
+                <button type="submit" id="number-submit-btn">Add Flight</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="mode-car" class="mode-section">
+        <form id="car-form">
+            <div class="autocomplete-wrapper" style="margin-bottom:15px;">
+                <label>Start City or Location:</label>
+                <input type="text" id="car-start" placeholder="e.g. Chicago or Denver..." autocomplete="off" required>
+                <ul id="car-start-autocomplete" class="autocomplete-list"></ul>
+            </div>
+            <div class="autocomplete-wrapper" style="margin-bottom:15px;">
+                <label>End City or Location:</label>
+                <input type="text" id="car-end" placeholder="e.g. Seattle or Miami..." autocomplete="off" required>
+                <ul id="car-end-autocomplete" class="autocomplete-list"></ul>
             </div>
             <label>Date:</label>
-            <input type="date" id="route-date" style="margin-bottom:15px;" required>
-            <label>Flight Number (Optional):</label>
-            <input type="text" id="opt-flight-number" placeholder="e.g. DL0001" style="margin-bottom:20px;">
-            <button type="submit">Add Flight</button>
+            <input type="date" id="car-date" style="margin-bottom:20px;" required>
+            <button type="submit">Add Drive</button>
         </form>
     </div>
 
-    <div id="number-tab" class="tab-content">
-        <form id="number-form">
-            <label>Flight Number:</label>
-            <input type="text" id="flight-number" placeholder="e.g. DL496" style="margin-bottom:15px;" required>
+    <div id="mode-train" class="mode-section">
+        <form id="train-form">
+            <label>Start City:</label>
+            <input type="text" id="train-start" placeholder="e.g. Paris..." style="margin-bottom:15px;" required>
+            <label>End City:</label>
+            <input type="text" id="train-end" placeholder="e.g. London..." style="margin-bottom:15px;" required>
             <label>Date:</label>
-            <input type="date" id="number-date" style="margin-bottom:20px;" required>
-            <button type="submit" id="number-submit-btn">Add Flight</button>
+            <input type="date" id="train-date" style="margin-bottom:20px;" required>
+            <button type="submit">Add Train Route</button>
+        </form>
+    </div>
+
+    <div id="mode-boats" class="mode-section">
+        <form id="boat-form">
+            <label>Start City / Port:</label>
+            <input type="text" id="boat-start" placeholder="e.g. Miami..." style="margin-bottom:15px;" required>
+            <label>End City / Port:</label>
+            <input type="text" id="boat-end" placeholder="e.g. Nassau..." style="margin-bottom:15px;" required>
+            <label>Date:</label>
+            <input type="date" id="boat-date" style="margin-bottom:20px;" required>
+            <button type="submit">Add Boat Route</button>
         </form>
     </div>
 
@@ -161,6 +275,7 @@
     <div id="map"></div>
     <div id="stats-container">
         <div id="stats-panel">
+            <div id="stats-mode-selector" onclick="cycleStatsMode()">Flight Stats ▾</div>
             <div class="stat-col">
                 <div class="stat-box">
                     <div class="stat-value" id="stat-dist">0 km</div>
@@ -168,7 +283,7 @@
                 </div>
                 <div class="stat-box">
                     <div class="stat-value" id="stat-time">0h 0m</div>
-                    <div class="stat-label">Time in Air</div>
+                    <div class="stat-label">Time in Transit</div>
                 </div>
             </div>
             <div class="stat-col">
@@ -183,14 +298,14 @@
                     </div>
                     <div class="stat-box" style="padding:8px;align-items:center;">
                         <div class="stat-value" id="stat-airports">0</div>
-                        <div class="stat-label" style="text-align:center;">Airports</div>
+                        <div class="stat-label" id="label-airports" style="text-align:center;">Airports</div>
                     </div>
                 </div>
             </div>
             <div class="stat-col">
                 <div class="stat-box">
                     <div class="stat-value" id="stat-total-flights">0</div>
-                    <div class="stat-label">Total Flights</div>
+                    <div class="stat-label" id="label-total-flights">Total Flights</div>
                 </div>
                 <div class="stat-box">
                     <div class="stat-value" id="stat-timezones">0</div>
@@ -211,7 +326,7 @@
 <div id="help-modal-overlay">
     <div id="help-modal">
         <button id="help-modal-close" onclick="closeHelp()">×</button>
-        <h3>✈️ Flight Tracker Help</h3>
+        <h3>Flight Tracker Help</h3>
         <p>For best results, <strong>set your browser zoom to 100%</strong> (press <code>Ctrl+0</code> / <code>Cmd+0</code>).</p>
         <p>Questions, feedback, or bugs? Reach out at:<br>
            <a href="/cdn-cgi/l/email-protection#83e2f1ede2f5ade9e2eaedc3e8f6ade6e7f6"><span class="__cf_email__" data-cfemail="18796a76796e367279717658736d367d7c6d">[email&#160;protected]</span></a>
@@ -440,8 +555,97 @@ function setupAutocomplete(inputId, listId) {
 setupAutocomplete('start-airport','start-autocomplete');
 setupAutocomplete('end-airport',  'end-autocomplete');
 
+// OpenStreetMap (Photon) Autocomplete for Addresses/Cities
+function setupAddressAutocomplete(inputId, listId) {
+    const input = document.getElementById(inputId);
+    const list = document.getElementById(listId);
+    let focus = -1;
+    let debounceTimer;
+
+    input.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        const val = this.value.trim();
+        list.innerHTML = '';
+        focus = -1;
+
+        if (!val || val.length < 3) {
+            list.style.display = 'none';
+            return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=8`);
+                if (!res.ok) return;
+                const data = await res.json();
+                
+                if (!data.features || !data.features.length) {
+                    list.style.display = 'none';
+                    return;
+                }
+
+                data.features.forEach(feature => {
+                    const props = feature.properties;
+                    let addressParts = [];
+                    if (props.name) addressParts.push(props.name);
+                    if (props.street) addressParts.push(props.street);
+                    if (props.city || props.town || props.village) addressParts.push(props.city || props.town || props.village);
+                    if (props.state) addressParts.push(props.state);
+                    if (props.country) addressParts.push(props.country);
+                    
+                    const uniqueParts = [...new Set(addressParts)];
+                    const formattedAddress = uniqueParts.join(', ');
+
+                    const li = document.createElement('li');
+                    li.className = 'autocomplete-item';
+                    const mainTitle = props.name || props.city || props.street || 'Location';
+                    li.innerHTML = `
+                        <span class="ac-code">${mainTitle}</span>
+                        <span class="ac-details">${formattedAddress}</span>
+                    `;
+                    
+                    li.onclick = () => {
+                        input.value = formattedAddress;
+                        // Store coordinates for the routing API
+                        input.dataset.lat = feature.geometry.coordinates[1];
+                        input.dataset.lon = feature.geometry.coordinates[0];
+                        list.style.display = 'none';
+                    };
+                    list.appendChild(li);
+                });
+                list.style.display = 'block';
+
+            } catch (err) {
+                console.error("Geocoding error:", err);
+            }
+        }, 300); 
+    });
+
+    input.addEventListener('keydown', function(e) {
+        const items = list.getElementsByTagName('li');
+        if (!items.length || list.style.display === 'none') return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); focus++; activate(items); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); focus--; activate(items); }
+        else if (e.key === 'Enter') { e.preventDefault(); if (focus > -1) items[focus].click(); }
+    });
+
+    function activate(items) {
+        [...items].forEach(i => i.classList.remove('autocomplete-active'));
+        if (focus >= items.length) focus = 0;
+        if (focus < 0) focus = items.length - 1;
+        items[focus].classList.add('autocomplete-active');
+        items[focus].scrollIntoView({block: 'nearest'});
+    }
+
+    document.addEventListener('click', e => { if (e.target !== input) list.style.display = 'none'; });
+}
+
+// Initialize the autocomplete for the car form
+setupAddressAutocomplete('car-start', 'car-start-autocomplete');
+setupAddressAutocomplete('car-end', 'car-end-autocomplete');
+
 // The data persists
-const presetColors = ['#007bff','#28a745','#dc3545','#ffc107','#17a2b8','#6f42c1','#fd7e14','#343a40'];
+const presetColors = ['#007bff','#6c757d','#28a745','#dc3545','#17a2b8','#6f42c1','#fd7e14','#343a40'];
 let routesState = {}, flightIdCounter = 0;
 let cachedStats = { totalKm:0, totalMin:0, totalKgCO2:0, tzChanges:0, totalFlights:0, airportCounts:{}, uniqueCountries:new Set() };
 
@@ -544,6 +748,17 @@ document.getElementById('number-form').addEventListener('submit', async function
         if (!routesState[key]) {
             routesState[key] = { color: presetColors[0], flights: [] };
         }
+
+        if (!routesState[groupKey]) {
+            routesState[groupKey] = { 
+                color: presetColors[1],
+                type: 'car', 
+                geoJSON: routeGeoJSON,
+                distanceKm: data.routes[0].distance / 1000,   // SAVING THIS FOR STATS
+                durationMin: data.routes[0].duration / 60,    // SAVING THIS FOR STATS
+                flights: [] 
+            };
+        }
         
         routesState[key].flights.push({ 
             id: flightIdCounter++, 
@@ -577,9 +792,26 @@ function renderApp() {
     for (const [key, data] of Object.entries(routesState)) {
         if (!data.flights.length) continue;
         const isRT = new Set(data.flights.map(f=>f.from)).size > 1;
-        const [cA, cB] = key.split('-');
-        drawPath(cA, cB, isRT, data.color);
+        
+        // MAP DRAWING LOGIC
+        if (data.type === 'car') {
+            // Draw highway path
+            L.geoJSON(data.geoJSON, {
+                style: { color: data.color, weight: 4, opacity: 0.8 }
+            }).addTo(mapLayers);
+            
+            // Draw start and end dots
+            const coords = data.geoJSON.coordinates;
+            const ms = { radius: 5, fillColor: 'white', color: '#333', weight: 2, opacity: 1, fillOpacity: 0.8 };
+            L.circleMarker([coords[0][1], coords[0][0]], ms).addTo(mapLayers); 
+            L.circleMarker([coords[coords.length-1][1], coords[coords.length-1][0]], ms).addTo(mapLayers);
+        } else {
+            // Draw plane path
+            const [cA, cB] = key.split('-');
+            drawPath(cA, cB, isRT, data.color);
+        }
 
+        // SIDEBAR LIST UI
         const from = data.flights[0].from, to = data.flights[0].to;
         const arrow = isRT ? '↔' : '➔';
         const li = document.createElement('li');
@@ -597,7 +829,7 @@ function renderApp() {
                     <span><b>${f.from} ➔ ${f.to}</b> | ${fmtDate(f.date)} ${f.flightNum?`<span class="flight-badge">${f.flightNum}</span>`:''}</span>
                     <button class="delete-flight-btn" onclick="delFlight('${key}',${f.id})">×</button>
                 </div>`).join('');
-            info = `<button class="more-btn" onclick="toggleDetails(this)">+ ${data.flights.length} flights (Show More)</button><div class="flight-details-list">${rows}</div>`;
+            info = `<button class="more-btn" onclick="toggleDetails(this)">+ ${data.flights.length} trips (Show More)</button><div class="flight-details-list">${rows}</div>`;
         }
 
         li.innerHTML = `
@@ -612,6 +844,7 @@ function renderApp() {
             </div>`;
         document.getElementById('flight-list').appendChild(li);
     }
+    
     calculateStatistics();
 }
 
@@ -710,53 +943,101 @@ function tzCrossed(tzA, tzB) {
 }
 
 // Statistics
+let statsMode = 'flights'; // 'flights', 'cars', 'total'
+const modeLabels = {
+    flights: { title: 'Flight Stats', loc: 'Airports', count: 'Total Flights', top: 'Top Airports' },
+    cars: { title: 'Car Stats', loc: 'Cities', count: 'Total Journeys', top: 'Top Cities' },
+    total: { title: 'Total Stats', loc: 'Locations', count: 'Total Journeys', top: 'Top Locations' }
+};
+
+function cycleStatsMode() {
+    const modes = ['flights', 'cars', 'total'];
+    statsMode = modes[(modes.indexOf(statsMode) + 1) % modes.length];
+    refreshStatDisplay();
+}
+
 function calculateStatistics() {
-    let totalKm=0, totalMin=0, totalKgCO2=0, tzChanges=0, totalFlights=0;
-    let airportCounts={}, uniqueCountries=new Set();
+    let stats = {
+        flights: { totalKm:0, totalMin:0, totalKgCO2:0, tzChanges:0, count:0, locations:{}, uniqueCountries:new Set() },
+        cars:    { totalKm:0, totalMin:0, totalKgCO2:0, tzChanges:0, count:0, locations:{}, uniqueCountries:new Set() },
+        total:   { totalKm:0, totalMin:0, totalKgCO2:0, tzChanges:0, count:0, locations:{}, uniqueCountries:new Set() }
+    };
 
     for (const key in routesState) {
-        routesState[key].flights.forEach(f => {
-            const {from,to} = f;
-            totalFlights++;
-            airportCounts[from] = (airportCounts[from]||0)+1;
-            airportCounts[to]   = (airportCounts[to]  ||0)+1;
-            if (airportData[from]) uniqueCountries.add(airportData[from].country);
-            if (airportData[to])   uniqueCountries.add(airportData[to].country);
+        const data = routesState[key];
+        const type = data.type || 'flight';
+        const target = type === 'car' ? stats.cars : stats.flights;
 
-            // Timezones, use the tz field directly from airports.json
-            const tzFrom = airportData[from]?.tz;
-            const tzTo   = airportData[to]?.tz;
-            tzChanges += tzCrossed(tzFrom, tzTo);
+        data.flights.forEach(f => {
+            const {from, to} = f;
+            target.count++;
+            stats.total.count++;
 
-            // Distance
-            const kAB=`${from}-${to}`, kBA=`${to}-${from}`;
-            let km=0, min=0;
-            if      (validRoutesData[kAB]) { km=validRoutesData[kAB].km; min=validRoutesData[kAB].min; }
-            else if (validRoutesData[kBA]) { km=validRoutesData[kBA].km; min=validRoutesData[kBA].min; }
-            else if (airportData[from]&&airportData[to]) {
-                km  = turf.distance(turf.point([airportData[from].lon,airportData[from].lat]),
-                                    turf.point([airportData[to].lon,  airportData[to].lat  ]),
-                                    {units:'kilometers'});
-                min = (km/800)*60+30;
+            target.locations[from] = (target.locations[from]||0)+1;
+            target.locations[to]   = (target.locations[to]||0)+1;
+            stats.total.locations[from] = (stats.total.locations[from]||0)+1;
+            stats.total.locations[to]   = (stats.total.locations[to]||0)+1;
+
+            if (airportData[from]) { target.uniqueCountries.add(airportData[from].country); stats.total.uniqueCountries.add(airportData[from].country); }
+            if (airportData[to])   { target.uniqueCountries.add(airportData[to].country);   stats.total.uniqueCountries.add(airportData[to].country); }
+
+            let km = 0, min = 0, co2 = 0, tz = 0;
+
+            if (type === 'flight') {
+                const tzFrom = airportData[from]?.tz;
+                const tzTo   = airportData[to]?.tz;
+                tz = tzCrossed(tzFrom, tzTo);
+
+                const kAB=`${from}-${to}`, kBA=`${to}-${from}`;
+                if (validRoutesData[kAB]) { km=validRoutesData[kAB].km; min=validRoutesData[kAB].min; }
+                else if (validRoutesData[kBA]) { km=validRoutesData[kBA].km; min=validRoutesData[kBA].min; }
+                else if (airportData[from] && airportData[to]) {
+                    km  = turf.distance(turf.point([airportData[from].lon,airportData[from].lat]), turf.point([airportData[to].lon,airportData[to].lat]), {units:'kilometers'});
+                    min = (km/800)*60+30;
+                }
+                co2 = km * 0.115; // Flight CO2 estimate
+            } else if (type === 'car') {
+                // Read saved OSRM data, or fallback to Turf measurement if loading old saved data
+                if (data.distanceKm) {
+                    km = data.distanceKm;
+                    min = data.durationMin;
+                } else if (data.geoJSON) {
+                    km = turf.length(data.geoJSON, {units: 'kilometers'});
+                    min = (km / 80) * 60; // fallback assume 80km/h
+                }
+                co2 = km * 0.192; // Average car CO2 estimate per km
+                tz = 0; // Simplified for cars
             }
-            totalKm+=km; totalMin+=min;
+
+            target.totalKm += km; target.totalMin += min; target.totalKgCO2 += co2; target.tzChanges += tz;
+            stats.total.totalKm += km; stats.total.totalMin += min; stats.total.totalKgCO2 += co2; stats.total.tzChanges += tz;
         });
     }
-    totalKgCO2 = totalKm*0.115;
-    cachedStats = { totalKm, totalMin, totalKgCO2, tzChanges, totalFlights, airportCounts, uniqueCountries };
+    
+    cachedStats = stats;
     refreshStatDisplay();
 }
 
 function refreshStatDisplay() {
-    const {totalKm,totalMin,totalKgCO2,tzChanges,totalFlights,airportCounts,uniqueCountries} = cachedStats;
-    document.getElementById('stat-dist').innerText          = fmtDist(totalKm);
-    document.getElementById('stat-time').innerText          = fmtTime(totalMin);
-    document.getElementById('stat-emissions').innerText     = fmtWeight(totalKgCO2);
-    document.getElementById('stat-airports').innerText      = Object.keys(airportCounts).length;
-    document.getElementById('stat-countries').innerText     = uniqueCountries.size;
-    document.getElementById('stat-total-flights').innerText = totalFlights;
-    document.getElementById('stat-timezones').innerText     = tzChanges;
-    renderTopAirportBars(airportCounts);
+    const s = cachedStats[statsMode];
+    const labels = modeLabels[statsMode];
+
+    // Update Text Labels dynamically based on view
+    document.getElementById('stats-mode-selector').innerText = labels.title;
+    document.getElementById('label-airports').innerText      = labels.loc;
+    document.getElementById('label-total-flights').innerText = labels.count;
+    document.getElementById('top-box-title').textContent     = topViewMode === 'airports' ? labels.top : 'Top Routes';
+
+    // Update Values
+    document.getElementById('stat-dist').innerText          = fmtDist(s.totalKm);
+    document.getElementById('stat-time').innerText          = fmtTime(s.totalMin);
+    document.getElementById('stat-emissions').innerText     = fmtWeight(s.totalKgCO2);
+    document.getElementById('stat-airports').innerText      = Object.keys(s.locations).length;
+    document.getElementById('stat-countries').innerText     = s.uniqueCountries.size;
+    document.getElementById('stat-total-flights').innerText = s.count;
+    document.getElementById('stat-timezones').innerText     = s.tzChanges;
+    
+    renderTopAirportBars(s.locations);
 }
 
 // airports and routes toggle 
@@ -777,7 +1058,14 @@ function renderTopAirportBars(airportCounts) {
     if (topViewMode === 'routes') {
         const routeCounts = {};
         for (const key in routesState) {
-            const flights = routesState[key].flights;
+            const data = routesState[key];
+            const type = data.type || 'flight';
+            
+            // Respect the active toggle filter!
+            if (statsMode === 'flights' && type !== 'flight') continue;
+            if (statsMode === 'cars' && type !== 'car') continue;
+
+            const flights = data.flights;
             if (!flights.length) continue;
             const label = `${flights[0].from}→${flights[0].to}`;
             routeCounts[label] = (routeCounts[label] || 0) + flights.length;
@@ -786,10 +1074,10 @@ function renderTopAirportBars(airportCounts) {
             }
         }
         items = Object.entries(routeCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if (!items.length) { el.innerHTML='<li style="color:#999;font-size:0.8em;">No flights yet.</li>'; return; }
+        if (!items.length) { el.innerHTML='<li style="color:#999;font-size:0.8em;">No data yet.</li>'; return; }
     } else {
         items = Object.entries(airportCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
-        if (!items.length) { el.innerHTML='<li style="color:#999;font-size:0.8em;">No flights yet.</li>'; return; }
+        if (!items.length) { el.innerHTML='<li style="color:#999;font-size:0.8em;">No data yet.</li>'; return; }
     }
 
     const max = items[0][1];
@@ -818,6 +1106,101 @@ function renderTopAirportBars(airportCounts) {
     });
 }
 
+
+// Function to handle Transport Mode switching
+function switchMode(modeId, btnElement, newTitle) {
+    // Reset all mode buttons
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    // Activate clicked button
+    btnElement.classList.add('active');
+
+    // Hide all mode sections
+    document.querySelectorAll('.mode-section').forEach(s => s.classList.remove('active'));
+    // Show active mode section
+    document.getElementById(modeId).classList.add('active');
+    
+    // Update the main sidebar title
+    document.getElementById('main-title').innerText = newTitle;
+}
+
+// Temporary stubs for the new forms so they don't refresh the page on submit
+['train-form', 'boat-form'].forEach(formId => {
+    document.getElementById(formId).addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('Not yet implemented');
+    });
+});
+
+
+document.getElementById('car-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const startInput = document.getElementById('car-start');
+    const endInput = document.getElementById('car-end');
+    const date = document.getElementById('car-date').value;
+    const btn = this.querySelector('button[type="submit"]');
+
+    const startLat = startInput.dataset.lat;
+    const startLon = startInput.dataset.lon;
+    const endLat = endInput.dataset.lat;
+    const endLon = endInput.dataset.lon;
+
+    if (!startLat || !endLat) {
+        alert('Please select valid addresses from the autocomplete dropdown.');
+        return;
+    }
+
+    btn.innerText = "Routing...";
+    btn.disabled = true;
+
+    try {
+        // Fetch road route from OSRM
+        const url = `https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (!data.routes || !data.routes.length) throw new Error("No route found");
+
+        const routeGeoJSON = data.routes[0].geometry;
+        
+        // Use a unique group key for this specific drive
+        const groupKey = `car-${startLon},${startLat}-${endLon},${endLat}`;
+        
+        if (!routesState[groupKey]) {
+            routesState[groupKey] = { 
+                color: presetColors[1],
+                type: 'car', 
+                geoJSON: routeGeoJSON, // Cache the road shape
+                flights: [] 
+            };
+        }
+
+        const shortFrom = startInput.value.split(',')[0];
+        const shortTo = endInput.value.split(',')[0];
+
+        routesState[groupKey].flights.push({
+            id: flightIdCounter++,
+            from: shortFrom,
+            to: shortTo,
+            date: date,
+            flightNum: 'Car' // Repurposing the badge for an icon
+        });
+
+        startInput.value = ''; endInput.value = '';
+        delete startInput.dataset.lat; delete startInput.dataset.lon;
+        delete endInput.dataset.lat; delete endInput.dataset.lon;
+        
+        renderApp();
+
+    } catch (err) {
+        alert("Could not find a driving route between these locations.");
+        console.error(err);
+    } finally {
+        btn.innerText = "Add Drive";
+        btn.disabled = false;
+    }
+});
+
 </script>
 </body>
 </html>
+
