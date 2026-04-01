@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Flight Tracker</title>
+    <title>Modern Travel Tracker</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
@@ -57,7 +57,6 @@
         .ac-code { font-weight: bold; color: #007bff; font-size: 1.1em; }
         .ac-details { color: #666; margin-top: 2px; }
 
-        /* Stats Panel */
         #stats-container {
             position: absolute; bottom: 0; left: 0; right: 0; z-index: 1000;
             overflow: hidden; pointer-events: none;
@@ -107,62 +106,17 @@
         #help-modal-close { position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #aaa; line-height: 1; padding: 0; }
         #help-modal-close:hover { color: #333; }
 
-        .mode-buttons {
-            display: flex;
-            margin-bottom: 15px;
-            background: #eef2f5;
-            border-radius: 8px;
-            padding: 4px;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .mode-btn {
-            flex: 1;
-            padding: 8px 2px;
-            cursor: pointer;
-            background: transparent;
-            border: none;
-            font-size: 0.85em;
-            font-weight: 700;
-            color: #666;
-            transition: 0.2s;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-        }
+        .mode-buttons { display: flex; margin-bottom: 15px; background: #eef2f5; border-radius: 8px; padding: 4px; gap: 4px; flex-shrink: 0; }
+        .mode-btn { flex: 1; padding: 8px 2px; cursor: pointer; background: transparent; border: none; font-size: 0.85em; font-weight: 700; color: #666; transition: 0.2s; border-radius: 6px; display: flex; align-items: center; justify-content: center; gap: 4px; }
         .mode-btn:hover { color: #333; }
-        .mode-btn.active {
-            background: #fff;
-            color: #007bff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
+        .mode-btn.active { background: #fff; color: #007bff; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .mode-section { display: none; flex-direction: column; flex-shrink: 0; }
         .mode-section.active { display: flex; }
 
-        #stats-mode-selector {
-            position: absolute;
-            top: 8px;
-            left: 24px;
-            font-size: 0.85em;
-            font-weight: 800;
-            color: #007bff;
-            cursor: pointer;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            user-select: none;
-            transition: color 0.2s;
-        }
+        #stats-mode-selector { position: absolute; top: 8px; left: 24px; font-size: 0.85em; font-weight: 800; color: #007bff; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; user-select: none; transition: color 0.2s; }
         #stats-mode-selector:hover { color: #0056b3; }
 
-        /* Train status bar inside form */
-        #train-status {
-            font-size: 0.82em;
-            min-height: 18px;
-            margin-bottom: 8px;
-            color: #555;
-        }
+        #train-status { font-size: 0.82em; min-height: 18px; margin-bottom: 8px; color: #555; }
         #train-status.error { color: #dc3545; }
         #train-status.success { color: #28a745; }
     </style>
@@ -170,7 +124,7 @@
 <body>
 
 <div id="sidebar">
-    <h2 id="main-title" style="margin-top:0; flex-shrink:0;">Flight Tracker</h2>
+    <h2 id="main-title" style="margin-top:0; flex-shrink:0;">Travel Tracker</h2>
 
     <div class="mode-buttons">
         <button class="mode-btn active" onclick="switchMode('mode-flights', this, 'Flight Tracker')">Flights</button>
@@ -179,13 +133,12 @@
         <button class="mode-btn" onclick="switchMode('mode-boats', this, 'Boat Tracker')">Boat</button>
     </div>
 
-    <!-- ===== FLIGHTS ===== -->
+    <!-- FLIGHTS -->
     <div id="mode-flights" class="mode-section active">
         <div class="tab-buttons" style="flex-shrink:0;">
             <button class="tab-btn active" onclick="switchTab('route-tab')">By Route</button>
             <button class="tab-btn" onclick="switchTab('number-tab')">By Flight #</button>
         </div>
-
         <div id="route-tab" class="tab-content active">
             <form id="route-form">
                 <div class="row">
@@ -207,7 +160,6 @@
                 <button type="submit">Add Flight</button>
             </form>
         </div>
-
         <div id="number-tab" class="tab-content">
             <form id="number-form">
                 <label>Flight Number:</label>
@@ -219,7 +171,7 @@
         </div>
     </div>
 
-    <!-- ===== CAR ===== -->
+    <!-- CAR -->
     <div id="mode-car" class="mode-section">
         <form id="car-form">
             <div class="autocomplete-wrapper" style="margin-bottom:15px;">
@@ -238,7 +190,7 @@
         </form>
     </div>
 
-    <!-- ===== TRAIN ===== -->
+    <!-- TRAIN -->
     <div id="mode-train" class="mode-section">
         <form id="train-form">
             <div class="autocomplete-wrapper" style="margin-bottom:15px;">
@@ -256,12 +208,12 @@
             <div id="train-status"></div>
             <button type="submit">Add Train Route</button>
             <p style="font-size:0.75em;color:#999;margin-top:12px;line-height:1.5;border-top:1px solid #eee;padding-top:10px;">
-                <strong style="color:#777;">Note:</strong> This finds the shortest rail path between two points and may not reflect the actual route taken. For better accuracy, break long journeys into individual stops — e.g. Paris → Metz → Luxembourg City, rather than Paris → Luxembourg City directly.
+                <strong style="color:#777;">Note:</strong> This finds the shortest rail path between two points and may not reflect the actual route taken. For better accuracy, break long journeys into individual stops.
             </p>
         </form>
     </div>
 
-    <!-- ===== BOATS ===== -->
+    <!-- BOATS -->
     <div id="mode-boats" class="mode-section">
         <form id="boat-form">
             <label>Start City / Port:</label>
@@ -331,13 +283,13 @@
     </div>
 </div>
 
-<!-- Help Modal -->
 <div id="help-modal-overlay">
     <div id="help-modal">
         <button id="help-modal-close" onclick="closeHelp()">×</button>
         <h3>Tracker Help</h3>
         <p>For best results, <strong>set your browser zoom to 100%</strong> (press <code>Ctrl+0</code> / <code>Cmd+0</code>).</p>
         <p>Train routes use OpenStreetMap rail data for routing, and stations are found via Photon. Routes show the shortest rail path, not necessarily the actual journey — add intermediate stops for better accuracy.</p>
+        <p>Timezone crossings for car and train routes are determined using real IANA timezone data based on start/end coordinates.</p>
     </div>
 </div>
 
@@ -366,7 +318,6 @@ const iconHelp     = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="cu
 const iconShare    = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>`;
 const iconExport   = `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
 
-// Zoom + Recenter control
 L.Control.ZoomRecenter = L.Control.extend({
     onAdd: function(map) {
         const c = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
@@ -385,7 +336,6 @@ L.Control.ZoomRecenter = L.Control.extend({
 });
 map.addControl(new L.Control.ZoomRecenter({ position:'topleft' }));
 
-// Toolbar
 L.Control.Toolbar = L.Control.extend({
     onAdd: function(map) {
         const bar = L.DomUtil.create('div','leaflet-bar leaflet-control');
@@ -478,7 +428,6 @@ function setupAutocomplete(inputId, listId) {
     const input = document.getElementById(inputId);
     const list  = document.getElementById(listId);
     let focus   = -1;
-
     input.addEventListener('input', function() {
         const val = this.value.toLowerCase().trim();
         list.innerHTML=''; focus=-1;
@@ -500,7 +449,6 @@ function setupAutocomplete(inputId, listId) {
         });
         list.style.display='block';
     });
-
     input.addEventListener('keydown', function(e) {
         const items=list.getElementsByTagName('li');
         if (!items.length||list.style.display==='none') return;
@@ -508,7 +456,6 @@ function setupAutocomplete(inputId, listId) {
         else if (e.key==='ArrowUp'){focus--;activate(items);}
         else if (e.key==='Enter'){e.preventDefault();if(focus>-1)items[focus].click();}
     });
-
     function activate(items) {
         [...items].forEach(i=>i.classList.remove('autocomplete-active'));
         if (focus>=items.length) focus=0;
@@ -526,7 +473,6 @@ function setupAddressAutocomplete(inputId, listId) {
     const input = document.getElementById(inputId);
     const list  = document.getElementById(listId);
     let focus=-1, debounceTimer;
-
     input.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         const val=this.value.trim();
@@ -563,7 +509,6 @@ function setupAddressAutocomplete(inputId, listId) {
             } catch(err){console.error('Geocoding error:',err);}
         },300);
     });
-
     input.addEventListener('keydown', function(e) {
         const items=list.getElementsByTagName('li');
         if (!items.length||list.style.display==='none') return;
@@ -571,7 +516,6 @@ function setupAddressAutocomplete(inputId, listId) {
         else if (e.key==='ArrowUp'){e.preventDefault();focus--;activateAddr(items);}
         else if (e.key==='Enter'){e.preventDefault();if(focus>-1)items[focus].click();}
     });
-
     function activateAddr(items) {
         [...items].forEach(i=>i.classList.remove('autocomplete-active'));
         if (focus>=items.length) focus=0;
@@ -584,47 +528,34 @@ function setupAddressAutocomplete(inputId, listId) {
 setupAddressAutocomplete('car-start','car-start-autocomplete');
 setupAddressAutocomplete('car-end','car-end-autocomplete');
 
-// ── Train station autocomplete (Photon, railway filter) ────────────────────
+// ── Train station autocomplete ─────────────────────────────────────────────
 function setupTrainStationAutocomplete(inputId, listId) {
     const input = document.getElementById(inputId);
     const list  = document.getElementById(listId);
     let focus=-1, debounceTimer;
-
     input.addEventListener('input', function() {
         clearTimeout(debounceTimer);
         const val=this.value.trim();
         list.innerHTML=''; focus=-1;
-
-        // Clear any previously selected coordinates when user edits
-        delete input.dataset.lat;
-        delete input.dataset.lon;
-        delete input.dataset.stationName;
-        delete input.dataset.country;
-
+        delete input.dataset.lat; delete input.dataset.lon;
+        delete input.dataset.stationName; delete input.dataset.country;
         if (!val||val.length<2){list.style.display='none';return;}
-
         debounceTimer=setTimeout(async()=>{
-            // Show a loading placeholder
             const loadingLi=document.createElement('li');
             loadingLi.className='autocomplete-item';
             loadingLi.innerHTML='<span class="ac-details" style="color:#888;">Searching stations…</span>';
             list.appendChild(loadingLi);
             list.style.display='block';
-
             try {
-                // Photon with railway:station and railway:halt tags
                 const url=`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&limit=10&osm_tag=railway:station&osm_tag=railway:halt`;
                 const res=await fetch(url);
                 if (!res.ok) throw new Error('Search failed (HTTP '+res.status+')');
                 const data=await res.json();
-
                 const features=(data.features||[]).filter(f=>{
                     const p=f.properties||{};
                     return p.name && f.geometry && f.geometry.coordinates;
                 });
-
                 list.innerHTML='';
-
                 if (!features.length){
                     const noLi=document.createElement('li');
                     noLi.className='autocomplete-item';
@@ -633,7 +564,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
                     list.style.display='block';
                     return;
                 }
-
                 features.forEach(feature=>{
                     const p=feature.properties;
                     const name=p.name||'Station';
@@ -641,7 +571,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
                     const detail=locParts.join(', ');
                     const lon=feature.geometry.coordinates[0];
                     const lat=feature.geometry.coordinates[1];
-
                     const li=document.createElement('li');
                     li.className='autocomplete-item';
                     li.innerHTML=`<span class="ac-code">${name}</span><span class="ac-details">${detail||'Railway station'}</span>`;
@@ -658,7 +587,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
                     list.appendChild(li);
                 });
                 list.style.display='block';
-
             } catch(err) {
                 list.innerHTML='';
                 const errLi=document.createElement('li');
@@ -669,7 +597,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
             }
         },350);
     });
-
     input.addEventListener('keydown', function(e) {
         const items=list.getElementsByTagName('li');
         if (!items.length||list.style.display==='none') return;
@@ -677,7 +604,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
         else if (e.key==='ArrowUp'){e.preventDefault();focus--;activateTrain(items);}
         else if (e.key==='Enter'){e.preventDefault();if(focus>-1)items[focus].click();}
     });
-
     function activateTrain(items) {
         [...items].forEach(i=>i.classList.remove('autocomplete-active'));
         if (focus>=items.length) focus=0;
@@ -685,8 +611,6 @@ function setupTrainStationAutocomplete(inputId, listId) {
         items[focus].classList.add('autocomplete-active');
         items[focus].scrollIntoView({block:'nearest'});
     }
-
-    // Close dropdown when clicking outside
     document.addEventListener('click',e=>{
         if(e.target!==input&&!list.contains(e.target)) list.style.display='none';
     });
@@ -776,6 +700,21 @@ document.getElementById('number-form').addEventListener('submit', async function
     finally{submitBtn.innerText=originalBtnText;submitBtn.disabled=false;submitBtn.style.backgroundColor='';}
 });
 
+// Timezone lookup via TimeAPI
+async function fetchTimezone(lat, lon) {
+    try {
+        const url = `https://timeapi.io/api/TimeZone/coordinate?latitude=${lat}&longitude=${lon}`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        // TimeAPI returns the IANA timezone name in data.timeZone (note the capital Z)
+        return data.timeZone || null;
+    } catch (e) {
+        console.warn('Timezone lookup failed for', lat, lon, e);
+        return null;
+    }
+}
+
 // ── Car form ───────────────────────────────────────────────────────────────
 document.getElementById('car-form').addEventListener('submit', async function(e) {
     e.preventDefault();
@@ -788,27 +727,32 @@ document.getElementById('car-form').addEventListener('submit', async function(e)
     if (!startLat||!endLat){alert('Please select valid addresses from the autocomplete dropdown.');return;}
     btn.innerText='Routing...'; btn.disabled=true;
     try {
-        const url=`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`;
-        const res=await fetch(url);
-        const data=await res.json();
+        // Fetch the driving route AND both real timezones in parallel
+        const [routeRes, startTz, endTz] = await Promise.all([
+            fetch(`https://router.project-osrm.org/route/v1/driving/${startLon},${startLat};${endLon},${endLat}?overview=full&geometries=geojson`),
+            fetchTimezone(startLat, startLon),
+            fetchTimezone(endLat, endLon)
+        ]);
+        const data = await routeRes.json();
         if (!data.routes||!data.routes.length) throw new Error('No route found');
-        const routeGeoJSON=data.routes[0].geometry;
-        const groupKey=`car-${startLon},${startLat}-${endLon},${endLat}`;
+        const routeGeoJSON = data.routes[0].geometry;
+        const groupKey = `car-${startLon},${startLat}-${endLon},${endLat}`;
         if (!routesState[groupKey]) {
-            routesState[groupKey]={
-                color:presetColors[1], type:'car',
-                geoJSON:routeGeoJSON,
-                distanceKm:data.routes[0].distance/1000,
-                durationMin:data.routes[0].duration/60,
-                startCountry:startInput.dataset.country||'',
-                endCountry:endInput.dataset.country||'',
-                startTzOffset:Math.round(parseFloat(startLon)/15),
-                endTzOffset:Math.round(parseFloat(endLon)/15),
-                flights:[]
+            routesState[groupKey] = {
+                color: presetColors[1],
+                type: 'car',
+                geoJSON: routeGeoJSON,
+                distanceKm: data.routes[0].distance / 1000,
+                durationMin: data.routes[0].duration / 60,
+                startCountry: startInput.dataset.country || '',
+                endCountry:   endInput.dataset.country   || '',
+                startTz: startTz || null,   // IANA tz string, e.g. "America/Chicago"
+                endTz:   endTz   || null,   // IANA tz string, e.g. "America/Denver"
+                flights: []
             };
         }
-        const shortFrom=startInput.value.split(',')[0];
-        const shortTo=endInput.value.split(',')[0];
+        const shortFrom = startInput.value.split(',')[0];
+        const shortTo   = endInput.value.split(',')[0];
         routesState[groupKey].flights.push({id:flightIdCounter++,from:shortFrom,to:shortTo,date,flightNum:'Car'});
         startInput.value=''; endInput.value='';
         delete startInput.dataset.lat; delete startInput.dataset.lon; delete startInput.dataset.country;
@@ -825,74 +769,65 @@ document.getElementById('train-form').addEventListener('submit', async function(
     const endInput=document.getElementById('train-end');
     const date=document.getElementById('train-date').value;
     const btn=this.querySelector('button[type="submit"]');
-
     const startLat=startInput.dataset.lat, startLon=startInput.dataset.lon;
     const endLat=endInput.dataset.lat,     endLon=endInput.dataset.lon;
-
     if (!startLat||!endLat) {
         setTrainStatus('Please select stations from the dropdown suggestions.','error');
         return;
     }
-
     setTrainStatus('Searching for rail route…');
     btn.innerText='Routing…'; btn.disabled=true;
-
     try {
-        const lonlats=`${startLon},${startLat}|${endLon},${endLat}`;
-        const brouterUrl=`https://brouter.de/brouter?lonlats=${lonlats}&profile=rail&alternativeidx=0&format=geojson`;
-        const res=await fetch(brouterUrl);
+        const lonlats = `${startLon},${startLat}|${endLon},${endLat}`;
+        const brouterUrl = `https://brouter.de/brouter?lonlats=${lonlats}&profile=rail&alternativeidx=0&format=geojson`;
+
+        // Fetch the rail route AND both real timezones in parallel
+        const [res, startTz, endTz] = await Promise.all([
+            fetch(brouterUrl),
+            fetchTimezone(startLat, startLon),
+            fetchTimezone(endLat, endLon)
+        ]);
 
         if (!res.ok) {
             if (res.status===500) throw new Error('No rail route found between these stations. They may not be connected by rail in OpenStreetMap data.');
             throw new Error('Routing service returned HTTP '+res.status);
         }
-
-        const geojson=await res.json();
+        const geojson = await res.json();
         if (!geojson.features||!geojson.features.length) throw new Error('No rail route found.');
 
-        const props=geojson.features[0].properties||{};
-        const distanceKm=(props['track-length']||0)/1000;
-        // Estimate travel time: ~120 km/h average for intercity rail
-        const durationMin=(distanceKm/120)*60;
+        const props = geojson.features[0].properties || {};
+        const distanceKm = (props['track-length'] || 0) / 1000;
+        const durationMin = (distanceKm / 120) * 60; // ~120 km/h average
 
-        const startName=startInput.dataset.stationName||startInput.value.split('—')[0].trim();
-        const endName=endInput.dataset.stationName||endInput.value.split('—')[0].trim();
+        const startName = startInput.dataset.stationName || startInput.value.split('—')[0].trim();
+        const endName   = endInput.dataset.stationName   || endInput.value.split('—')[0].trim();
 
-        const groupKey=`train-${parseFloat(startLon).toFixed(4)},${parseFloat(startLat).toFixed(4)}-${parseFloat(endLon).toFixed(4)},${parseFloat(endLat).toFixed(4)}`;
+        const groupKey = `train-${parseFloat(startLon).toFixed(4)},${parseFloat(startLat).toFixed(4)}-${parseFloat(endLon).toFixed(4)},${parseFloat(endLat).toFixed(4)}`;
 
         if (!routesState[groupKey]) {
-            routesState[groupKey]={
-                color:presetColors[2],
-                type:'train',
-                geoJSON:geojson.features[0].geometry,
+            routesState[groupKey] = {
+                color: presetColors[2],
+                type: 'train',
+                geoJSON: geojson.features[0].geometry,
                 distanceKm,
                 durationMin,
-                startCountry:startInput.dataset.country||'',
-                endCountry:endInput.dataset.country||'',
-                startTzOffset:Math.round(parseFloat(startLon)/15),
-                endTzOffset:Math.round(parseFloat(endLon)/15),
-                flights:[]
+                startCountry: startInput.dataset.country || '',
+                endCountry:   endInput.dataset.country   || '',
+                startTz: startTz || null,   // IANA tz string, e.g. "Europe/Paris"
+                endTz:   endTz   || null,   // IANA tz string, e.g. "Europe/London"
+                flights: []
             };
         }
+        routesState[groupKey].flights.push({id:flightIdCounter++,from:startName,to:endName,date,flightNum:'Train'});
 
-        routesState[groupKey].flights.push({
-            id:flightIdCounter++,
-            from:startName,
-            to:endName,
-            date,
-            flightNum:'Train'
-        });
-
-        // Clear inputs
         startInput.value=''; endInput.value='';
         delete startInput.dataset.lat; delete startInput.dataset.lon; delete startInput.dataset.stationName; delete startInput.dataset.country;
         delete endInput.dataset.lat;   delete endInput.dataset.lon;   delete endInput.dataset.stationName;   delete endInput.dataset.country;
 
-        setTrainStatus(`Route added: ${(distanceKm).toFixed(0)} km`,'success');
+        setTrainStatus(`Route added: ${distanceKm.toFixed(0)} km`, 'success');
         renderApp();
-
     } catch(err) {
-        setTrainStatus(err.message,'error');
+        setTrainStatus(err.message, 'error');
         console.error(err);
     } finally {
         btn.innerText='Add Train Route'; btn.disabled=false;
@@ -915,37 +850,23 @@ function renderApp() {
         if (!data.flights.length) continue;
         const isRT=new Set(data.flights.map(f=>f.from)).size>1;
 
-        // ── Draw on map ──
         if (data.type==='car'||data.type==='train') {
-            const style={
-                color:data.color,
-                weight:data.type==='train'?4:4,
-                opacity:0.9,
-                dashArray:data.type==='train'?'1,0':''  // solid for train, solid for car
-            };
+            const style={color:data.color,weight:4,opacity:0.9,dashArray:''};
             if (data.geoJSON) {
                 L.geoJSON(data.geoJSON,{style}).addTo(mapLayers);
-                // Draw endpoint dots
                 const coords=data.geoJSON.coordinates;
                 if (coords&&coords.length) {
-                    const ms={radius:5,fillColor:'white',color:'#333',weight:2,opacity:1,fillOpacity:0.8};
+                    const ms={radius:2.5, fillColor:'#000',color:'#000',weight:1,opacity:1,fillOpacity:1};
                     const first=coords[0], last=coords[coords.length-1];
                     L.circleMarker([first[1],first[0]],ms).addTo(mapLayers);
                     L.circleMarker([last[1],last[0]],ms).addTo(mapLayers);
                 }
             }
         } else {
-            // Flight: great circle arc
-            const parts=key.split('-');
-            if (parts.length>=2) {
-                // key is like "JFK-LAX" — airports sorted
-                // find actual from/to from first flight
-                const f0=data.flights[0];
-                drawPath(f0.from,f0.to,isRT,data.color);
-            }
+            const f0=data.flights[0];
+            drawPath(f0.from,f0.to,isRT,data.color);
         }
 
-        // ── Sidebar card ──
         const f0=data.flights[0];
         const from=f0.from, to=f0.to;
         const arrow=isRT?'↔':'➔';
@@ -986,7 +907,7 @@ function drawPath(cA, cB, isRT, color) {
     const a=airportData[cA], b=airportData[cB];
     const gc=turf.greatCircle(turf.point([a.lon,a.lat]),turf.point([b.lon,b.lat]));
     const ls={color,weight:3,opacity:0.8,dashArray:isRT?'':'8,8'};
-    const ms={radius:5,fillColor:'white',color:'#333',weight:2,opacity:1,fillOpacity:0.8};
+    const ms={radius:2.5,fillColor:'#000',color:'#000',weight:1,opacity:1,fillOpacity:1};
     [-360,0,360].forEach(off=>{
         const sh=JSON.parse(JSON.stringify(gc));
         turf.coordEach(sh,c=>{c[0]+=off;});
@@ -1093,21 +1014,16 @@ function calculateStatistics() {
 
         data.flights.forEach(f=>{
             const {from,to}=f;
-            target.count++;
-            stats.total.count++;
-
-            // Location counting
+            target.count++; stats.total.count++;
             target.locations[from]=(target.locations[from]||0)+1;
             target.locations[to]=(target.locations[to]||0)+1;
             stats.total.locations[from]=(stats.total.locations[from]||0)+1;
             stats.total.locations[to]=(stats.total.locations[to]||0)+1;
 
-            // Country counting
             if (type==='flight') {
                 if (airportData[from]){target.uniqueCountries.add(airportData[from].country);stats.total.uniqueCountries.add(airportData[from].country);}
                 if (airportData[to])  {target.uniqueCountries.add(airportData[to].country);stats.total.uniqueCountries.add(airportData[to].country);}
             } else {
-                // Car and train store country directly on the route
                 if (data.startCountry){target.uniqueCountries.add(data.startCountry);stats.total.uniqueCountries.add(data.startCountry);}
                 if (data.endCountry)  {target.uniqueCountries.add(data.endCountry);stats.total.uniqueCountries.add(data.endCountry);}
             }
@@ -1130,17 +1046,15 @@ function calculateStatistics() {
                 km=data.distanceKm||(data.geoJSON?turf.length(data.geoJSON,{units:'kilometers'}):0);
                 min=data.durationMin||((km/80)*60);
                 co2=km*0.192;
-                // Timezone: estimate from stored longitude offsets (15° per hour)
-                tz=(data.startTzOffset!==undefined&&data.endTzOffset!==undefined)
-                    ?Math.abs(data.endTzOffset-data.startTzOffset):0;
+                // Use real IANA timezone strings looked up at route-add time
+                tz = tzCrossed(data.startTz, data.endTz);
 
             } else if (type==='train') {
                 km=data.distanceKm||(data.geoJSON?turf.length(data.geoJSON,{units:'kilometers'}):0);
                 min=data.durationMin||((km/120)*60);
-                co2=km*0.041; // ~41g CO₂/km for rail (EU average)
-                // Timezone: estimate from stored longitude offsets (15° per hour)
-                tz=(data.startTzOffset!==undefined&&data.endTzOffset!==undefined)
-                    ?Math.abs(data.endTzOffset-data.startTzOffset):0;
+                co2=km*0.041;
+                // Use real IANA timezone strings looked up at route-add time
+                tz = tzCrossed(data.startTz, data.endTz);
             }
 
             target.totalKm+=km; target.totalMin+=min; target.totalKgCO2+=co2; target.tzChanges+=tz;
@@ -1155,12 +1069,10 @@ function calculateStatistics() {
 function refreshStatDisplay() {
     const s=cachedStats[statsMode]||{totalKm:0,totalMin:0,totalKgCO2:0,tzChanges:0,count:0,locations:{},uniqueCountries:new Set()};
     const labels=modeLabels[statsMode];
-
     document.getElementById('stats-mode-selector').innerText=labels.title;
     document.getElementById('label-airports').innerText=labels.loc;
     document.getElementById('label-total-flights').innerText=labels.count;
     document.getElementById('top-box-title').textContent=topViewMode==='airports'?labels.top:'Top Routes';
-
     document.getElementById('stat-dist').innerText=fmtDist(s.totalKm);
     document.getElementById('stat-time').innerText=fmtTime(s.totalMin);
     document.getElementById('stat-emissions').innerText=fmtWeight(s.totalKgCO2);
@@ -1168,7 +1080,6 @@ function refreshStatDisplay() {
     document.getElementById('stat-countries').innerText=s.uniqueCountries.size;
     document.getElementById('stat-total-flights').innerText=s.count;
     document.getElementById('stat-timezones').innerText=s.tzChanges;
-
     renderTopAirportBars(s.locations);
 }
 
@@ -1183,7 +1094,6 @@ function renderTopAirportBars(locationCounts) {
     const el=document.getElementById('top-airports-list');
     el.innerHTML='';
     let items=[];
-
     if (topViewMode==='routes') {
         const routeCounts={};
         for (const key in routesState) {
@@ -1201,7 +1111,6 @@ function renderTopAirportBars(locationCounts) {
     } else {
         items=Object.entries(locationCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
     }
-
     if (!items.length){el.innerHTML='<li style="color:#999;font-size:0.8em;">No data yet.</li>';return;}
     const max=items[0][1];
     items.forEach(([label,count])=>{
