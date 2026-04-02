@@ -6,9 +6,10 @@
     <title>Modern Travel Tracker</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>✈️</text></svg>">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
         html { margin: 0; padding: 0; height: 100%; }
-        body { margin: 0; padding: 0; display: flex; height: 100vh; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #eef2f5; color: #333; }
+        body { margin: 0; padding: 0; display: flex; height: 100vh; font-family: 'Inter', Roboto, Helvetica, Arial, sans-serif; background-color: #eef2f5; color: #333; }
         #sidebar { width: 380px; background-color: #ffffff; padding: 25px; box-shadow: 4px 0 15px rgba(0,0,0,0.05); z-index: 10; display: flex; flex-direction: column; border-radius: 0 20px 20px 0; position: relative; }
         #map-container { flex-grow: 1; position: relative; overflow: hidden; }
         #map { width: 100%; height: 100%; }
@@ -113,8 +114,14 @@
         .mode-section { display: none; flex-direction: column; flex-shrink: 0; }
         .mode-section.active { display: flex; }
 
-        #stats-mode-selector { position: absolute; top: 8px; left: 24px; font-size: 0.85em; font-weight: 800; color: #007bff; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; user-select: none; transition: color 0.2s; }
-        #stats-mode-selector:hover { color: #0056b3; }
+        #stats-mode-selector { position: absolute; top: 8px; left: 24px; font-size: 0.8em; font-weight: 700; color: #007bff; cursor: pointer; user-select: none; white-space: nowrap; }
+        #stats-mode-selector .sms-label { display: inline; }
+        #stats-mode-selector .sms-arrow { display: inline; margin-left: 3px; font-size: 0.9em; }
+        #stats-mode-dropdown { display: none; position: absolute; top: calc(100% + 4px); left: 0; background: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); z-index: 2000; min-width: 100%; overflow: hidden; }
+        #stats-mode-dropdown.open { display: block; }
+        .sms-option { padding: 8px 14px; font-size: 0.8em; font-weight: 700; color: #555; white-space: nowrap; transition: background 0.15s, color 0.15s; }
+        .sms-option:hover { background: #f0f4ff; color: #007bff; }
+        .sms-option.active { color: #007bff; }
 
         #train-status { font-size: 0.82em; min-height: 18px; margin-bottom: 8px; color: #555; }
         #train-status.error { color: #dc3545; }
@@ -168,6 +175,9 @@
                 <input type="date" id="number-date" style="margin-bottom:20px;" required>
                 <button type="submit" id="number-submit-btn">Add Flight</button>
             </form>
+            <p style="font-size:0.75em; color:#999; margin-top:12px; line-height:1.5; border-top:1px solid #eee; padding-top:10px;">
+                <strong style="color:#777;">Note:</strong> Flight number data can vary as schedules change. This field accepts both <strong>IATA</strong> (e.g., DL496) and <strong>ICAO</strong> (e.g., DAL496) codes.
+            </p>
         </div>
     </div>
 
@@ -208,7 +218,7 @@
             <div id="train-status"></div>
             <button type="submit">Add Train Route</button>
             <p style="font-size:0.75em;color:#999;margin-top:12px;line-height:1.5;border-top:1px solid #eee;padding-top:10px;">
-                <strong style="color:#777;">Note:</strong> This finds the shortest rail path between two points and may not reflect the actual route taken. For better accuracy, break long journeys into individual stops.
+            <strong style="color:#777;">Note:</strong> This finds the shortest rail path between two points and may not reflect the actual route taken. For better accuracy, break long journeys into individual stops. For example instead of Paris to Luxembourg, add Paris to Metz to Luxembourg.
             </p>
         </form>
     </div>
@@ -236,7 +246,15 @@
     <div id="map"></div>
     <div id="stats-container">
         <div id="stats-panel">
-            <div id="stats-mode-selector" onclick="cycleStatsMode()">Flight Stats ▾</div>
+            <div id="stats-mode-selector" onclick="toggleStatsModeDropdown(event)">
+                <span class="sms-label">All Stats</span><span class="sms-arrow">▾</span>
+                <div id="stats-mode-dropdown">
+                    <div class="sms-option active" data-value="total" onclick="setStatsMode('total',event)">All Stats</div>
+                    <div class="sms-option" data-value="flights" onclick="setStatsMode('flights',event)">Flight Stats</div>
+                    <div class="sms-option" data-value="cars" onclick="setStatsMode('cars',event)">Car Stats</div>
+                    <div class="sms-option" data-value="trains" onclick="setStatsMode('trains',event)">Train Stats</div>
+                </div>
+            </div>
             <div class="stat-col">
                 <div class="stat-box">
                     <div class="stat-value" id="stat-dist">0 km</div>
@@ -288,8 +306,8 @@
         <button id="help-modal-close" onclick="closeHelp()">×</button>
         <h3>Tracker Help</h3>
         <p>For best results, <strong>set your browser zoom to 100%</strong> (press <code>Ctrl+0</code> / <code>Cmd+0</code>).</p>
-        <p>Train routes use OpenStreetMap rail data for routing, and stations are found via Photon. Routes show the shortest rail path, not necessarily the actual journey — add intermediate stops for better accuracy.</p>
-        <p>Timezone crossings for car and train routes are determined using real IANA timezone data based on start/end coordinates.</p>
+        <p>The emissions are an estimate and very inaccurate.</p>
+        <p>For all inquiries, please contact arnav dot jain at ku dot edu</p>
     </div>
 </div>
 
@@ -297,8 +315,11 @@
 <script src="https://unpkg.com/leaflet-image@0.4.0/leaflet-image.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<!-- lz-string removed: sharing now uses backend hash storage -->
 <script>
+
+// ── Backend URL (update this to match your server) ────────────────────────
+const BACKEND_URL = 'http://localhost:5000';
 
 // ── Units ──────────────────────────────────────────────────────────────────
 let useMetric = false;
@@ -406,10 +427,21 @@ window.onload = async function() {
         if (iataCodesRes.ok) iataCodes = await iataCodesRes.json();
         if (icaoCodesRes.ok) icaoCodes = await icaoCodesRes.json();
 
-        const compressed = new URLSearchParams(window.location.search).get('m');
-        if (compressed) {
-            routesState = JSON.parse(LZString.decompressFromEncodedURIComponent(compressed));
-            window.history.replaceState({},document.title,window.location.pathname);
+        const shareHash = new URLSearchParams(window.location.search).get('h');
+        if (shareHash) {
+            try {
+                const res = await fetch(`${BACKEND_URL}/load/${shareHash}`);
+                if (res.ok) {
+                    const json = await res.json();
+                    routesState = json.state;
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    alert('Share link not found or expired.');
+                }
+            } catch(err) {
+                console.error('Failed to load shared state:', err);
+                alert('Could not reach the sharing server.');
+            }
         } else {
             const saved = localStorage.getItem('flightTrackerState');
             if (saved) routesState = JSON.parse(saved);
@@ -949,10 +981,24 @@ function exportMap() {
         ctrl.style.display='block';
     }).catch(()=>{alert('Export failed.');ctrl.style.display='block';});
 }
-function generateShareLink() {
-    if (!Object.keys(routesState).length){alert('Add routes first!');return;}
-    const url=window.location.href.split('?')[0]+'?m='+LZString.compressToEncodedURIComponent(JSON.stringify(routesState));
-    navigator.clipboard.writeText(url).then(()=>alert('Share link copied!')).catch(()=>prompt('Copy this link:',url));
+async function generateShareLink() {
+    if (!Object.keys(routesState).length) { alert('Add routes first!'); return; }
+    try {
+        const res = await fetch(`${BACKEND_URL}/save`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ state: routesState })
+        });
+        if (!res.ok) throw new Error(`Server responded with ${res.status}`);
+        const { hash } = await res.json();
+        const url = window.location.href.split('?')[0] + '?h=' + hash;
+        navigator.clipboard.writeText(url)
+            .then(() => alert('Share link copied!'))
+            .catch(() => prompt('Copy this link:', url));
+    } catch (err) {
+        console.error('Share failed:', err);
+        alert('Could not generate share link: ' + err.message);
+    }
 }
 function toggleStats() {
     const cont=document.getElementById('stats-container');
@@ -989,19 +1035,27 @@ function tzCrossed(tzA,tzB) {
 }
 
 // ── Statistics ─────────────────────────────────────────────────────────────
-let statsMode='flights';
+let statsMode='total';
 const modeLabels={
-    flights:{ title:'Flight Stats ▾', loc:'Airports',  count:'Total Flights',   top:'Top Airports'  },
-    cars:   { title:'Car Stats ▾',    loc:'Cities',    count:'Total Drives',    top:'Top Cities'    },
-    trains: { title:'Train Stats ▾',  loc:'Stations',  count:'Total Trips',     top:'Top Stations'  },
-    total:  { title:'All Stats ▾',    loc:'Locations', count:'Total Journeys',  top:'Top Locations' }
+    flights:{ title:'Flight Stats', loc:'Airports',  count:'Total Flights',   top:'Top Airports'  },
+    cars:   { title:'Car Stats',    loc:'Cities',    count:'Total Drives',    top:'Top Cities'    },
+    trains: { title:'Train Stats',  loc:'Stations',  count:'Total Trips',     top:'Top Stations'  },
+    total:  { title:'All Stats',    loc:'Locations', count:'Total Journeys',  top:'Top Locations' }
 };
 
-function cycleStatsMode() {
-    const modes=['flights','cars','trains','total'];
-    statsMode=modes[(modes.indexOf(statsMode)+1)%modes.length];
+function toggleStatsModeDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('stats-mode-dropdown').classList.toggle('open');
+}
+function setStatsMode(val, e) {
+    if (e) e.stopPropagation();
+    statsMode = val;
+    document.getElementById('stats-mode-dropdown').classList.remove('open');
     refreshStatDisplay();
 }
+document.addEventListener('click', () => {
+    document.getElementById('stats-mode-dropdown')?.classList.remove('open');
+});
 
 function calculateStatistics() {
     const blank=()=>({totalKm:0,totalMin:0,totalKgCO2:0,tzChanges:0,count:0,locations:{},uniqueCountries:new Set()});
@@ -1069,7 +1123,8 @@ function calculateStatistics() {
 function refreshStatDisplay() {
     const s=cachedStats[statsMode]||{totalKm:0,totalMin:0,totalKgCO2:0,tzChanges:0,count:0,locations:{},uniqueCountries:new Set()};
     const labels=modeLabels[statsMode];
-    document.getElementById('stats-mode-selector').innerText=labels.title;
+    document.querySelector('#stats-mode-selector .sms-label').textContent = labels.title;
+    document.querySelectorAll('.sms-option').forEach(o => o.classList.toggle('active', o.dataset.value === statsMode));
     document.getElementById('label-airports').innerText=labels.loc;
     document.getElementById('label-total-flights').innerText=labels.count;
     document.getElementById('top-box-title').textContent=topViewMode==='airports'?labels.top:'Top Routes';
