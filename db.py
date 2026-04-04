@@ -25,7 +25,7 @@ HASH_LENGTH      = 20           # hex chars kept from SHA-256
 ALLOWED_ORIGINS  = [            # tighten this to your actual domain(s)
     "http://localhost",
     "http://127.0.0.1",
-    "http://192.168.0.79:5000",
+    "https://arnav-jain1.github.io",
     # "https://yourapp.example.com",
 ]
 DATA_DIR = Path(__file__).parent / "data"
